@@ -1,0 +1,15 @@
+doctype 5
+html
+  head
+    title= 'Socket Api Test'
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type='text/javascript', src='/javascripts/coffee-script.js')
+    script(type='text/javascript', src='/javascripts/socket.js')
+    script(type='text/javascript')
+      var socket = io.connect('http://192.168.33.10:3000/?channel=test');
+      socket.on('test', function(data){ 
+        window.webkitNotifications.createNotification('http://www.google.com/favicon.ico', 'Works', data).show();
+      });
+
+  body
+    block content

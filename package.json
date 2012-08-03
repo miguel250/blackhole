@@ -1,0 +1,12 @@
+{
+    "name": "backhole"
+  , "version": "0.0.1"
+  , "private": true
+  , "dependencies": {
+    "coffee-script": "1.3.3"
+    , "socket.io": "0.9.9"
+    , "redis":"0.7.2"
+    , "kue":"0.4.0"
+    , "express": "3.0.0"
+  }
+}
