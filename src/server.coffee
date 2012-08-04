@@ -66,7 +66,6 @@ else
     console.log "Blackhole server listening on port %d in %s mode", app.get('port'), app.settings.env
 
   io.sockets.on 'connection',(socket) ->
-    connectCounter++
     hs = socket.handshake
     channel =  hs.query.channel 
     emitter.on 'add_queue', (data) -> socket.emit channel, data.body
