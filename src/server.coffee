@@ -1,61 +1,72 @@
-express = require("express")
 path = require('path')
 http = require('http')
-redis = require("redis")
-{EventEmitter} = require('events')
-client = redis.createClient()
-
-app = express()
+cluster = require("cluster")
+numCPUs = require("os").cpus().length
 
 
-exports.data = ''
+if cluster.isMaster
+  i = 0
+  while i < numCPUs
+    work = cluster.fork()
+    i++
+  cluster.on "exit", (worker, code, signal) ->
+    console.log "worker " + worker.process.pid + " died"
+else
+  express = require("express")
+  redis = require("redis")
+  {EventEmitter} = require('events')
+  client = redis.createClient()
 
-app.configure ->
-  app.set 'port', process.env.PORT || 3000
-  app.set "views", __dirname + "/views"
-  app.set "view engine", "jade"
-  app.use express.logger('dev');
-  app.use require("./middleware/bodyparser")
-  app.use express.methodOverride()
-  app.use app.router
-  app.use express.static(path.join(__dirname, '../public'))
-
-app.configure "development", ->
-  app.use express.errorHandler(
-    dumpExceptions: true
-    showStack: true
-  )
-
-app.configure "production", ->
-  app.use express.errorHandler()
-
-app.get '/*', (req,res,next) ->
-  res.removeHeader("X-Powered-By")
-  res.header("Access-Control-Allow-Origin": "*")
-  next()
-
-emitter = new EventEmitter
-require('./controllers')(app, emitter)
-
-RedisStore = require("socket.io/lib/stores/redis")
-pub = redis.createClient()
-sub = redis.createClient()
-client = redis.createClient()
+  app = express()
 
 
-server = http.createServer(app)
-io = require('socket.io').listen(server)
+  exports.data = ''
 
-io.set "store", new RedisStore(
-  redisPub: pub
-  redisSub: sub
-  redisClient: client
-)
+  app.configure ->
+    app.set 'port', process.env.PORT || 3000
+    app.set "views", __dirname + "/views"
+    app.set "view engine", "jade"
+    app.use express.logger('dev');
+    app.use require("./middleware/bodyparser")
+    app.use express.methodOverride()
+    app.use app.router
+    app.use express.static(path.join(__dirname, '../public'))
 
-server.listen app.get('port'), ->
-  console.log "Blackhole server listening on port %d in %s mode", app.get('port'), app.settings.env
+  app.configure "development", ->
+    app.use express.errorHandler(
+      dumpExceptions: true
+      showStack: true
+    )
 
-io.on 'connection',(socket) ->
-  hs = socket.handshake
-  channel =  hs.query.channel
-  emitter.on 'add_queue', (data) -> socket.emit channel, data.body
+  app.configure "production", ->
+    app.use express.errorHandler()
+
+  app.get '/*', (req,res,next) ->
+    res.removeHeader("X-Powered-By")
+    res.header("Access-Control-Allow-Origin": "*")
+    next()
+
+  emitter = new EventEmitter
+  emitter.setMaxListeners(0)
+  require('./controllers')(app, emitter)
+
+  pub = redis.createClient()
+  sub = redis.createClient()
+  client = redis.createClient()
+
+
+  server = http.createServer(app)
+  sio = require('socket.io')
+  RedisStore = sio.RedisStore
+  io = sio.listen(server)
+
+  io.set 'store', new RedisStore
+
+  server.listen app.get('port'), ->
+    console.log "Blackhole server listening on port %d in %s mode", app.get('port'), app.settings.env
+
+  io.sockets.on 'connection',(socket) ->
+    connectCounter++
+    hs = socket.handshake
+    channel =  hs.query.channel 
+    emitter.on 'add_queue', (data) -> socket.emit channel, data.body
