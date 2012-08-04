@@ -16,7 +16,7 @@ if cluster.isMaster
   pid = process.pid
   
   fs.writeFile path.join(__dirname, '../pids'), pid, (err) ->
-    console.log("Saved master pid #{pid}")
+    console.log("Master pid: #{pid}")
 
   process.on 'SIGUSR2', ->
     
@@ -84,7 +84,7 @@ else
   io.set 'store', new RedisStore
 
   server.listen app.get('port'), ->
-    console.log "Blackhole server listening on port %d in %s mode", app.get('port'), app.settings.env
+    console.log "Blackhole server listening on port %d in %s mode on pid %d", app.get('port'), app.settings.env, process.pid
 
   io.sockets.on 'connection',(socket) ->
     hs = socket.handshake
