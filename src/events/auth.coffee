@@ -42,5 +42,6 @@ class Auth
 
     ReturnError: (status_code, message )->
         @res.statusCode = status_code
-        throw @res.send(message)
+        @res.send(message)
+        throw "Error: #{message}"
 module.exports = Auth
