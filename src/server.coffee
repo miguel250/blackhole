@@ -2,15 +2,36 @@ path = require('path')
 http = require('http')
 cluster = require("cluster")
 numCPUs = require("os").cpus().length
+fs = require('fs')
 
 
 if cluster.isMaster
   i = 0
+  workers = []
+  
   while i < numCPUs
-    work = cluster.fork()
+    workers.push(cluster.fork())
     i++
+  
+  pid = process.pid
+  
+  fs.writeFile path.join(__dirname, '../pids'), pid, (err) ->
+    console.log("Saved master pid #{pid}")
+
+  process.on 'SIGUSR2', ->
+    
+    old_works = workers
+    workers = []
+    console.log "Reloading Workers"
+
+    for worker in old_works
+      worker.send('force kill')
+      worker.process.kill('SIGQUIT')
+
   cluster.on "exit", (worker, code, signal) ->
+    workers.push(cluster.fork())
     console.log "worker " + worker.process.pid + " died"
+    
 else
   express = require("express")
   redis = require("redis")
@@ -69,3 +90,7 @@ else
     hs = socket.handshake
     channel =  hs.query.channel 
     emitter.on 'add_queue', (data) -> socket.emit channel, data.body
+
+  process.on "message", (msg) ->
+    if msg is "force kill"
+       server.close()
