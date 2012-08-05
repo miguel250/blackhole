@@ -6,8 +6,11 @@ html
     script(type='text/javascript', src='/javascripts/coffee-script.js')
     script(type='text/javascript', src='/javascripts/socket.js')
     script(type='text/javascript')
-      var socket = io.connect('/?channel=test');
-      socket.on('test', function(data){ 
+      var app_id = 1
+      var channel = 'test'
+      var app = io.connect('/'+app_id+'?channel='+channel+'&appid='+app_id);
+
+      app.on('testing', function(data){ 
         window.webkitNotifications.createNotification('http://www.google.com/favicon.ico', 'Works', data).show();
       });
 
