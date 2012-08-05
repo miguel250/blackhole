@@ -12,7 +12,7 @@ class API
             res.statusCode = 400
             res.send('invalid content-type')
 
-        auth = new Auth(req.query, res)
+        valid = new Auth(req.query, res).Valid()
         data =
             channel : req.params.channel_name
             body : req.body[0]
@@ -22,10 +22,9 @@ class API
             body_md5 : req.query['body_md5']
             auth_signature: req.query['auth_signature']
             auth_timestamp: req.query['auth_timestamp']
-
-        exports.events.emit 'add_queue', data
-
-        res.send('202 ACCEPTED\n')
+        if valid
+            exports.events.emit 'add_queue', data
+            res.send('202 ACCEPTED\n')
 
 module.exports = (app, events) ->
     api = new API(app, events)

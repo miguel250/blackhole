@@ -1,5 +1,6 @@
 class Auth
     constructor: (query, res) ->
+        @valid = true
         @query = query
         @res = res
         @Validate()
@@ -43,5 +44,6 @@ class Auth
     ReturnError: (status_code, message )->
         @res.statusCode = status_code
         @res.send(message)
-        throw "Error: #{message}"
+        @valid = false
+    Valid: -> @valid
 module.exports = Auth
