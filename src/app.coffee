@@ -45,15 +45,16 @@ require('./controllers')(app, emitter)
 server = http.createServer(app)
 sio = require('socket.io')
 RedisStore = sio.RedisStore
-io = sio.listen(server)
+io = sio.listen(server, {log:false})
 
 io.set 'store', new RedisStore
+
 
 io.sockets.on 'connection',(socket) ->
     hs = socket.handshake
     channel =  hs.query.channel 
     namespace = hs.query.appid
-
+    
     io.of("/#{namespace}").on 'connection', (socket)->
         socket.join channel
 
