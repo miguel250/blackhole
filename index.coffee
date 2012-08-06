@@ -1,0 +1,1 @@
+module.exports = if process.env.BLACKHOLE_COV then require("./app-cov/app") else require("./src/app")
