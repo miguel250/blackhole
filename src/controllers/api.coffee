@@ -5,7 +5,7 @@ class API
         app.post '/apps/:app_id/channels/:channel_name/events', @socket_api
             
     socket_api: (req, res) ->
-        Auth = require('../events/auth.coffee')
+        Auth = require('../events/auth')
         event = require('events')
         
         if req.header('content-type') != 'application/json'
@@ -23,8 +23,13 @@ class API
             auth_signature: req.query['auth_signature']
             auth_timestamp: req.query['auth_timestamp']
         if valid
-            exports.events.emit 'add_queue', data
-            res.send('202 ACCEPTED\n')
+            console.log data.body
+            if  data.body?
+                exports.events.emit 'add_queue', data
+                res.send('202 ACCEPTED\n')
+            else
+                res.statusCode = 400
+                res.send('invalid body')
 
 module.exports = (app, events) ->
     api = new API(app, events)
