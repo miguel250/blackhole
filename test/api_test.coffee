@@ -8,7 +8,7 @@ assert = require("assert")
 suite 'API', ->
 
     test 'Socket Events', (done) ->
-        running = server.listen 3000, ->
+        running = server.listen 5000, ->
             client = io.connect('http://localhost:3000/1?channel=test&appid=1', { 'connect timeout': 5000 })
             client.on 'connect', (socket) ->
                 date = new Date()
