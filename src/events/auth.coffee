@@ -15,7 +15,8 @@ class Auth
     ValidateTime: ->
         date = new Date()
         time = String(Math.round(date.getTime() / 1000) + date.getTimezoneOffset() * 60) - @query['auth_timestamp']
-        if not time? or time > 60
+
+        if isNaN(time) or time > 60
             @res.statusCode = 400
             @ReturnError(400, 'invalid auth_timestamp')
 
@@ -27,7 +28,7 @@ class Auth
         auth_timestamp = @query['auth_timestamp']
   
         if  not name?
-            @ReturnError(400, 'Event name missing')
+            @ReturnError(400, 'event name missing')
             
         if not auth_key?
             @ReturnError(400, 'authication key missing')

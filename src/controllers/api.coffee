@@ -23,7 +23,7 @@ class API
             auth_signature: req.query['auth_signature']
             auth_timestamp: req.query['auth_timestamp']
         if valid
-            if  data.body?
+            if  data.body != ''
                 exports.events.emit 'add_queue', data
                 res.send('202 ACCEPTED\n')
             else
