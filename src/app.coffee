@@ -4,6 +4,7 @@ path = require('path')
 redis = require("redis")
 {EventEmitter} = require('events')
 client = redis.createClient()
+cons = require('consolidate')
 
 
 app = express()
@@ -14,7 +15,8 @@ exports.data = ''
 app.configure ->
     app.set 'port', process.env.PORT || 3000
     app.set "views", __dirname + "/views"
-    app.set "view engine", "jade"
+    app.set "view engine", "twig"
+    app.engine('twig', cons.swig)
     app.use require("./middleware/bodyparser")
     app.use express.methodOverride()
     app.use app.router
