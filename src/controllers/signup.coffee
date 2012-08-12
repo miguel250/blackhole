@@ -1,4 +1,4 @@
-Session = require('../events/Session')
+Session = require('../events/session')
 
 class Signup
     constructor: (app) ->
