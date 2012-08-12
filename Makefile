@@ -1,4 +1,4 @@
-REPORTER = dot
+REPORTER = spec
 SOURCE = src/
 OUTPUT = lib/
 COV = app-cov/
