@@ -1,9 +1,9 @@
-REPORTER = spec
+REPORTER = dot
 SOURCE = src/
 OUTPUT = lib/
 COV = app-cov/
 test:
-	@NODE_ENV=test  ./node_modules/.bin/mocha \
+	@NODE_ENV=testing  ./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
 		--compilers coffee:coffee-script \
 		-u tdd
@@ -22,5 +22,5 @@ compile:
 	@rm -rf $(OUTPUT)
 	@mkdir $(OUTPUT)
 	@cp -r $(SOURCE)views  $(OUTPUT)views/
-	@coffee --compile --output $(OUTPUT) $(SOURCE)
+	@./node_modules/.bin/coffee --compile --output $(OUTPUT) $(SOURCE)
 .PHONY: compile

@@ -8,7 +8,7 @@ if cluster.isMaster
     i = 0
     workers = []
   
-    while i < numCPUs
+    while i < 5
         workers.push(cluster.fork())
         i++
   

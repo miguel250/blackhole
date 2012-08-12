@@ -1,6 +1,5 @@
-libpath ='' 
 qs = require('querystring')
-{server, app} = require('../')
+{server, app} = require('../').app
 request = require('supertest')
 io =  require('socket.io-client')
 assert = require("assert")
